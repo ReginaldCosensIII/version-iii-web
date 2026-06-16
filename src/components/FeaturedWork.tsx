@@ -1,0 +1,368 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { ExternalLink, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+
+const Github = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="24"
+    height="24"
+    stroke="currentColor"
+    strokeWidth="2"
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
+  </svg>
+);
+
+import placeholderCes from '@/assets/placeholder-ces.jpg';
+import placeholderRsi from '@/assets/placeholder-rsi.jpg';
+import placeholderPortal from '@/assets/placeholder-portal.jpg';
+import placeholderBooknook from '@/assets/placeholder-booknook.jpg';
+import placeholderPortfolio from '@/assets/placeholder-portfolio.jpg';
+
+interface Project {
+  title: string;
+  client: string;
+  description: string;
+  technologies: string[];
+  type: 'professional' | 'personal';
+  image: string;
+  liveUrl?: string;
+  githubUrl?: string;
+  status: string;
+}
+
+const projects: Project[] = [
+  {
+    title: "CES IT Services Website",
+    client: "Computer Enhancement Systems, Inc.",
+    description: "Full redesign and development of a corporate IT services website with modern UI, service catalog, and client portal integration.",
+    technologies: ["React", "TypeScript", "Tailwind CSS", "Node.js"],
+    type: "professional",
+    image: placeholderCes,
+    liveUrl: "https://cesitservice.com",
+    status: "Live"
+  },
+  {
+    title: "RSI X-Ray Services Website",
+    client: "Computer Enhancement Systems, Inc.",
+    description: "Corporate website for industrial x-ray and inspection services featuring equipment showcase, service areas, and quote request system.",
+    technologies: ["React", "Tailwind CSS", "Supabase", "Vite"],
+    type: "professional",
+    image: placeholderRsi,
+    liveUrl: "https://rsi-xray.com",
+    status: "Live"
+  },
+  {
+    title: "HR Certifications Portal",
+    client: "Specialized Engineering",
+    description: "Internal web portal for tracking employee certifications, compliance deadlines, and automated renewal notifications across the organization.",
+    technologies: ["React", "PostgreSQL", "Node.js", "Express"],
+    type: "professional",
+    image: placeholderPortal,
+    status: "Internal LAN"
+  },
+  {
+    title: "Atomic's BookNook",
+    client: "Personal Project",
+    description: "Feature-rich online bookstore with role-based authentication, dynamic product displays, shopping cart, and full checkout system.",
+    technologies: ["Flask", "PostgreSQL", "Jinja2", "JavaScript"],
+    type: "personal",
+    image: placeholderBooknook,
+    liveUrl: "https://cs492-bookstore-project.onrender.com/",
+    githubUrl: "https://github.com/ReginaldCosensIII/cs492_bookstore_project",
+    status: "Live"
+  },
+  {
+    title: "WebDevPro.io Portfolio",
+    client: "Personal Project",
+    description: "Modern developer portfolio and business site with AI chatbot, project brief generator, blog, and client dashboard.",
+    technologies: ["React", "TypeScript", "Supabase", "Tailwind CSS"],
+    type: "personal",
+    image: placeholderPortfolio,
+    liveUrl: "https://webdevpro.io",
+    githubUrl: "https://github.com/reggiecosens/webdevpro",
+    status: "Live"
+  }
+];
+
+const StatusBadge = ({ status }: { status: string }) => (
+  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg ${
+    status === 'Internal LAN'
+      ? 'badge-status-internal bg-amber-950/90 text-amber-200 border border-amber-600/50'
+      : 'badge-status-live bg-emerald-950/90 text-emerald-200 border border-emerald-600/50'
+  }`}>
+    {status === 'Internal LAN' && <Lock className="w-3 h-3" />}
+    {status}
+  </span>
+);
+
+const TypeBadge = ({ type }: { type: 'professional' | 'personal' }) => (
+  <span className="badge-type inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg bg-webdev-darker-gray/90 text-blue-200 border border-blue-500/50">
+    {type === 'professional' ? 'Professional' : 'Personal'}
+  </span>
+);
+
+const ProjectActions = ({ project }: { project: Project }) => (
+  <div className="flex gap-3 flex-wrap">
+    {project.liveUrl && (
+      <Button variant="glass" size="sm" asChild>
+        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+          <ExternalLink className="w-4 h-4" />
+          View Live
+        </a>
+      </Button>
+    )}
+    {project.githubUrl && (
+      <Button variant="glass" size="sm" asChild>
+        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+          <Github className="w-4 h-4" />
+          Source Code
+        </a>
+      </Button>
+    )}
+    {!project.liveUrl && !project.githubUrl && (
+      <span className="inline-flex items-center gap-1.5 text-sm text-wdp-text-secondary">
+        <Lock className="w-4 h-4" />
+        Internal deployment only
+      </span>
+    )}
+  </div>
+);
+
+const DesktopCard = ({ project }: { project: Project }) => (
+  <div className="group relative card-unified card-feature rounded-2xl overflow-hidden">
+    <div className="relative w-full aspect-video overflow-hidden">
+      <img
+        src={project.image}
+        alt={`${project.title} preview screenshot`}
+        className="card-feature-img absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 motion-safe:group-hover:scale-[1.02]"
+      />
+      {/* Gradient overlays for readable text */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/10 transition-all duration-500 lg:group-hover:from-black/75 lg:group-hover:via-black/40 lg:group-hover:to-black/5" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-black/90 via-black/40 to-transparent transition-all duration-500 lg:group-hover:from-black/70 lg:group-hover:via-black/20 lg:group-hover:to-transparent" />
+
+      {/* Top badges */}
+      <div className="absolute top-5 left-5 flex items-center gap-2 z-10">
+        <TypeBadge type={project.type} />
+        <StatusBadge status={project.status} />
+      </div>
+
+      {/* Bottom content overlay */}
+      <div className="absolute inset-x-0 bottom-0 p-8 lg:p-10 z-10">
+        <div className="max-w-3xl">
+          <p className="text-wdp-text-secondary text-[11px] font-semibold tracking-[0.2em] uppercase mb-2">
+            {project.client}
+          </p>
+          <h3 className="text-3xl xl:text-4xl font-bold text-wdp-text leading-tight mb-3">
+            {project.title}
+          </h3>
+          <p className="text-wdp-text-secondary text-base leading-relaxed mb-5 line-clamp-2">
+            {project.description}
+          </p>
+          <ul className="flex flex-wrap gap-2 mb-5" aria-label="Technologies used">
+            {project.technologies.map((tech) => (
+              <li
+                key={tech}
+                className="px-2.5 py-1 rounded-md text-[11px] font-medium glass-effect text-wdp-text-secondary border border-white/10 transition-all duration-300 hover:border-webdev-gradient-blue/50 hover:text-wdp-text hover:-translate-y-0.5 hover:shadow-[0_4px_12px_-2px_hsl(var(--webdev-gradient-start)/0.3)]"
+              >
+                {tech}
+              </li>
+            ))}
+          </ul>
+          <ProjectActions project={project} />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const MobileCard = ({ project }: { project: Project }) => (
+  <div className="card-unified card-feature rounded-xl overflow-hidden">
+    <div className="relative w-full aspect-[16/10] overflow-hidden">
+      <img
+        src={project.image}
+        alt={`${project.title} preview screenshot`}
+        className="w-full h-full object-cover object-top"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      <div className="absolute top-3 right-3"><StatusBadge status={project.status} /></div>
+      <div className="absolute top-3 left-3"><TypeBadge type={project.type} /></div>
+    </div>
+    <div className="p-5 space-y-3">
+      <p className="text-wdp-text-secondary text-xs uppercase tracking-wider">{project.client}</p>
+      <h3 className="text-xl font-bold text-wdp-text">{project.title}</h3>
+      <p className="text-wdp-text-secondary text-sm leading-relaxed">{project.description}</p>
+      <ul className="flex flex-wrap gap-1.5" aria-label="Technologies used">
+        {project.technologies.map((tech) => (
+          <li key={tech} className="px-2 py-0.5 rounded-md text-[11px] font-medium glass-effect text-wdp-text-secondary">
+            {tech}
+          </li>
+        ))}
+      </ul>
+      <ProjectActions project={project} />
+    </div>
+  </div>
+);
+
+const FeaturedWork = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isBelowDesktop, setIsBelowDesktop] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 1023px)');
+    const update = () => setIsBelowDesktop(mql.matches);
+    update();
+    mql.addEventListener('change', update);
+    return () => mql.removeEventListener('change', update);
+  }, []);
+
+  const touchStartX = React.useRef<number | null>(null);
+  const touchEndX = React.useRef<number | null>(null);
+
+  const next = useCallback(() => setCurrentIndex((prev) => (prev + 1) % projects.length), []);
+  const prev = useCallback(() => setCurrentIndex((prev) => (prev - 1 + projects.length) % projects.length), []);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(next, 5000);
+    return () => clearInterval(timer);
+  }, [isPaused, next]);
+
+  // Keyboard navigation for carousel
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!carouselRef.current?.contains(document.activeElement)) return;
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prev();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        next();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        setCurrentIndex(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        setCurrentIndex(projects.length - 1);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [prev, next]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+    touchEndX.current = null;
+    setIsPaused(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current !== null && touchEndX.current !== null) {
+      const diff = touchStartX.current - touchEndX.current;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) next();
+        else prev();
+      }
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+    setTimeout(() => setIsPaused(false), 3000);
+  };
+
+  const project = projects[currentIndex];
+
+  return (
+    <section id="featuredwork" aria-label="Recent Work" className="relative py-16 px-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center space-y-6 max-w-4xl mx-auto relative z-10 mb-12">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass-effect badge-hover">
+            <div className="w-2 h-2 bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple rounded-full animate-pulse" />
+            <span className="text-wdp-text text-sm">Featured Projects</span>
+          </div>
+
+          <h2 className="text-5xl md:text-7xl font-light tracking-tight">
+            <span className="text-wdp-text">Recent </span>
+            <span className="bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent font-bold">
+              Work
+            </span>
+          </h2>
+
+          <p className="text-lg text-wdp-text-secondary max-w-2xl mx-auto leading-relaxed">
+            A curated selection of professional and personal projects showcasing full-stack web development.
+          </p>
+        </div>
+
+        <div
+          ref={carouselRef}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Featured projects carousel"
+          tabIndex={0}
+          className="relative max-w-6xl mx-auto outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:ring-[hsl(var(--webdev-gradient-start))] rounded-2xl"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div key={currentIndex} className="animate-slide-reveal">
+            {isBelowDesktop ? (
+              <MobileCard project={project} />
+            ) : (
+              <DesktopCard project={project} />
+            )}
+          </div>
+        </div>
+
+        {/* Live region for screen readers */}
+        <div className="sr-only" aria-live="polite" aria-atomic="true">
+          Showing project {currentIndex + 1} of {projects.length}: {project.title}
+        </div>
+
+        {/* Unified carousel controls */}
+        <div className="flex items-center justify-center gap-4 mt-8">
+          <button onClick={prev} className="carousel-chevron" aria-label="Previous project">
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          
+          <div className="flex gap-2" role="tablist" aria-label="Select project">
+            {projects.map((_, index) => (
+              <button
+                key={index}
+                role="tab"
+                aria-selected={index === currentIndex}
+                className={`carousel-dot ${index === currentIndex ? 'active' : ''}`}
+                onClick={() => setCurrentIndex(index)}
+                aria-label={`Go to project ${index + 1}`}
+              />
+            ))}
+          </div>
+          
+          <button onClick={next} className="carousel-chevron" aria-label="Next project">
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="text-center mt-3">
+          <span className="text-wdp-text-secondary text-sm" aria-hidden="true">
+            {currentIndex + 1} of {projects.length}
+          </span>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default FeaturedWork;

@@ -1,0 +1,319 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, ChevronDown, Code, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+type ServiceLink = {
+  name: string;
+  path: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+const SERVICE_LINKS: ServiceLink[] = [
+  {
+    name: 'Web Development',
+    path: '/services', // Map Services main or individual page
+    description: 'Custom websites, full-stack builds, SEO & redesigns.',
+    icon: Code,
+  },
+  {
+    name: 'AI Solutions',
+    path: '/services', // Map Services main or individual page
+    description: 'AI integrations, assistants, chatbots & automation.',
+    icon: Sparkles,
+  },
+];
+
+const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);          // desktop hover
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // mobile click
+  const location = useLocation();
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Close menus on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setServicesOpen(false);
+    setMobileServicesOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isMenuOpen]);
+
+  const navItems = [
+    { name: 'Home', path: '/' },
+    { name: 'Portfolio', path: '/portfolio' },
+    { name: 'Blog', path: '/blog' },
+    { name: 'Contact', path: '/contact' },
+    { name: 'LaunchPad', path: '/project-brief' },
+  ];
+
+  const isActive = (path: string) => location.pathname === path;
+  const isServicesActive = location.pathname.startsWith('/services');
+
+  // Desktop hover: small delay before close so cursor can travel into menu
+  const openServices = () => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    setServicesOpen(true);
+  };
+  const scheduleCloseServices = () => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = setTimeout(() => setServicesOpen(false), 140);
+  };
+
+  return (
+    <motion.header
+      initial={{ opacity: 0, y: -64, filter: 'blur(12px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-0 left-0 right-0 z-50 glass-effect backdrop-blur-xl"
+    >
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link
+            to="/"
+            aria-label="Version III Web Services — Home"
+            className="group flex items-baseline gap-2 hover:opacity-90 transition-opacity duration-300"
+          >
+            <span className="text-2xl font-bold text-wdp-text tracking-wide leading-none">
+              Version{' '}
+              <span className="bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent">
+                III
+              </span>
+            </span>
+            <span className="hidden sm:inline text-[0.7rem] uppercase tracking-[0.18em] text-wdp-text-secondary leading-none">
+              Web Services
+            </span>
+          </Link>
+
+          {/* Desktop Navigation — hidden below lg breakpoint */}
+          <nav className="hidden lg:flex items-center space-x-4 xl:space-x-6">
+            <Link
+              to="/"
+              className={`text-sm font-medium transition-all duration-300 ${
+                isActive('/')
+                  ? 'bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent'
+                  : 'text-wdp-text-secondary hover-gradient-text'
+              }`}
+            >
+              Home
+            </Link>
+
+            {/* Services dropdown (hover) */}
+            <div
+              className="relative"
+              onMouseEnter={openServices}
+              onMouseLeave={scheduleCloseServices}
+            >
+              <button
+                type="button"
+                onFocus={openServices}
+                onBlur={scheduleCloseServices}
+                aria-haspopup="menu"
+                aria-expanded={servicesOpen}
+                className={`inline-flex items-center gap-1 text-sm font-medium transition-all duration-300 ${
+                  isServicesActive
+                    ? 'bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent'
+                    : 'text-wdp-text-secondary hover-gradient-text'
+                }`}
+              >
+                Services
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-300 ${servicesOpen ? 'rotate-180' : ''} ${isServicesActive ? 'text-webdev-gradient-blue' : ''}`}
+                  aria-hidden="true"
+                />
+              </button>
+
+              <AnimatePresence>
+                {servicesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute left-0 top-full pt-7 w-80"
+                    role="menu"
+                  >
+                    <div className="rounded-xl border border-white/10 shadow-2xl shadow-black/50 overflow-hidden bg-webdev-black/90 backdrop-blur-2xl">
+                      {SERVICE_LINKS.map((s) => {
+                        const Icon = s.icon;
+                        const active = isActive(s.path);
+                        return (
+                          <Link
+                            key={s.path}
+                            to={s.path}
+                            role="menuitem"
+                            onClick={() => setServicesOpen(false)}
+                            className="group flex items-start gap-3 p-4 transition-colors duration-200 hover:bg-white/[0.06] focus:bg-white/[0.06] focus:outline-none"
+                          >
+                            <div className="icon-gradient-container relative w-10 h-10 rounded-lg flex-shrink-0">
+                              <div className="icon-inner w-full h-full rounded-lg flex items-center justify-center">
+                                <Icon className="w-5 h-5" />
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div
+                                className={`text-sm font-semibold transition-colors ${
+                                  active
+                                    ? 'bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent'
+                                    : 'text-wdp-text group-hover:bg-gradient-to-r group-hover:from-webdev-gradient-blue group-hover:to-webdev-gradient-purple group-hover:bg-clip-text group-hover:text-transparent'
+                                }`}
+                              >
+                                {s.name}
+                              </div>
+                              <p className="text-xs text-wdp-text-secondary leading-snug mt-0.5">
+                                {s.description}
+                              </p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {navItems.slice(1).map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`text-sm font-medium transition-all duration-300 ${
+                  isActive(item.path)
+                    ? 'bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent'
+                    : 'text-wdp-text-secondary hover-gradient-text'
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
+
+            {/* Static Contact CTA */}
+            <Link to="/contact">
+              <Button variant="glass" size="sm" className="tracking-wide">
+                Get Started
+              </Button>
+            </Link>
+          </nav>
+
+          {/* Mobile/Tablet Menu Button */}
+          <div className="flex items-center space-x-3 lg:hidden">
+            <button
+              onClick={() => setIsMenuOpen((o) => !o)}
+              className="text-wdp-text hover:opacity-80 transition-colors duration-300"
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile/Tablet Navigation */}
+        <div
+          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            isMenuOpen ? 'max-h-[640px] opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0'
+          }`}
+        >
+          <div className="glass-effect rounded-lg backdrop-blur-xl">
+            <nav className="flex flex-col space-y-1 p-4">
+              <Link
+                to="/"
+                onClick={() => setIsMenuOpen(false)}
+                className={`text-sm font-medium py-2 transition-colors duration-300 ${
+                  isActive('/')
+                    ? 'bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent'
+                    : 'text-wdp-text-secondary hover:text-wdp-text'
+                }`}
+              >
+                Home
+              </Link>
+
+              {/* Mobile Services accordion */}
+              <button
+                type="button"
+                onClick={() => setMobileServicesOpen((o) => !o)}
+                aria-expanded={mobileServicesOpen}
+                className={`flex items-center justify-between w-full text-sm font-medium py-2 transition-colors duration-300 ${
+                  isServicesActive
+                    ? 'bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent'
+                    : 'text-wdp-text-secondary hover:text-wdp-text'
+                }`}
+              >
+                <span>Services</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-300 ${mobileServicesOpen ? 'rotate-180' : ''} ${isServicesActive ? 'text-webdev-gradient-blue' : 'text-wdp-text-secondary'}`}
+                  aria-hidden="true"
+                />
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  mobileServicesOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="pl-3 ml-1 border-l border-white/10 flex flex-col py-1">
+                  {SERVICE_LINKS.map((s) => {
+                    const Icon = s.icon;
+                    const active = isActive(s.path);
+                    return (
+                      <Link
+                        key={s.path}
+                        to={s.path}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`flex items-center gap-3 py-2 px-2 rounded-md transition-colors ${
+                          active
+                            ? 'bg-white/5'
+                            : 'hover:bg-white/5'
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 ${active ? 'text-webdev-gradient-blue' : 'text-wdp-text-secondary'}`} />
+                        <span
+                          className={`text-sm ${
+                            active
+                              ? 'bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent font-medium'
+                              : 'text-wdp-text-secondary'
+                          }`}
+                        >
+                          {s.name}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {navItems.slice(1).map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`text-sm font-medium py-2 transition-colors duration-300 ${
+                    isActive(item.path)
+                      ? 'bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent'
+                      : 'text-wdp-text-secondary hover:text-wdp-text'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+
+              <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="glass" size="sm" className="w-full tracking-wide mt-2">
+                  Get Started
+                </Button>
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </motion.header>
+  );
+};
+
+export default Header;

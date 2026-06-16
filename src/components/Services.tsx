@@ -1,0 +1,119 @@
+import { Code, Palette, Search, RefreshCw, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+const Services = () => {
+  const services = [
+    {
+      icon: Palette,
+      title: "Custom Website Design",
+      description: "Crafting responsive, on-brand websites that captivate and convert.",
+      features: ["Mobile-first design", "Clean, user-focused layouts", "High-end visual polish"]
+    },
+    {
+      icon: Code,
+      title: "Full-Stack Development",
+      description: "Complete front-end and back-end builds using modern code and frameworks.",
+      features: ["HTML, CSS, JavaScript, Python (Flask)", "Database and API integration", "Performance-optimized"]
+    },
+    {
+      icon: Search,
+      title: "SEO, AEO & AI Discoverability",
+      description: "Found by Google, ChatGPT, Perplexity, and AI agents — fast, citation-ready, and built for the new search layer.",
+      features: ["SEO + AEO optimization", "Cited by LLMs & AI agents", "Schema, llms.txt & semantic HTML"]
+    },
+    {
+      icon: RefreshCw,
+      title: "Redesign & Revamp",
+      description: "Give your outdated site a full makeover — sleek, modern, and high-converting.",
+      features: ["UI/UX refresh", "Code cleanup or replatforming", "Conversion-focused updates"]
+    }
+  ];
+
+  return (
+    <section className="relative py-16 px-6" id="services" aria-labelledby="services-heading">
+      <div className="max-w-6xl mx-auto">
+        <header className="text-center space-y-8 max-w-4xl mx-auto relative z-10 mb-16">
+          <div className="space-y-6">
+            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass-effect badge-hover" role="status" aria-live="polite">
+              <div className="w-2 h-2 bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple rounded-full animate-pulse" aria-hidden="true"></div>
+              <span className="text-wdp-text text-sm">Professional services</span>
+            </div>
+            
+            <h2 id="services-heading" className="text-5xl md:text-7xl font-light tracking-tight">
+              <span className="text-wdp-text">Web Development </span> 
+              <span className="bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple bg-clip-text text-transparent font-bold">
+                Services
+              </span>
+            </h2>
+            
+            <p className="text-xl text-wdp-text-secondary max-w-2xl mx-auto leading-relaxed">
+              Version III Web Services builds modern, structured, maintainable websites — from new business sites and redesigns to performance, SEO, and content improvements that strengthen your digital foundation.
+            </p>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16" role="list">
+          {services.map((service, index) => {
+            const IconComponent = service.icon;
+            return (
+              <article
+                key={service.title}
+                className="group card-unified card-feature rounded-xl p-8 h-full flex flex-col focus-within:ring-2 focus-within:ring-webdev-gradient-blue"
+                style={{ animationDelay: `${index * 150}ms` }}
+                role="listitem"
+              >
+                
+                <header className="flex items-center mb-6">
+                  <div className="icon-gradient-container relative w-12 h-12 rounded-lg mr-4" aria-hidden="true">
+                    <div className="icon-inner w-full h-full rounded-lg flex items-center justify-center">
+                      <IconComponent className="w-6 h-6" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-wdp-text group-hover:opacity-80 transition-colors duration-300">
+                    {service.title}
+                  </h3>
+                </header>
+
+                <p className="text-wdp-text-secondary text-base leading-relaxed mb-6 group-hover:text-wdp-text transition-colors duration-300">
+                  {service.description}
+                </p>
+
+                <ul className="space-y-3 mb-6 flex-grow">
+                  {service.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-center text-wdp-text-secondary group-hover:text-wdp-text transition-colors duration-300">
+                      <div className="w-2 h-2 rounded-full bg-gradient-to-r from-webdev-gradient-blue to-webdev-gradient-purple mr-3 flex-shrink-0" />
+                      <span className="text-sm leading-relaxed">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex justify-end mt-auto">
+                  <Link 
+                    to="/services"
+                    className="inline-flex items-center text-base text-webdev-gradient-blue hover:text-webdev-gradient-purple transition-colors duration-300 cursor-pointer group/link focus:outline-none focus:ring-2 focus:ring-webdev-gradient-blue focus:ring-offset-2 rounded-md p-2"
+                    aria-label={`Learn more about ${service.title}`}
+                  >
+                    Learn More
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover/link:translate-x-1 transition-transform duration-300" aria-hidden="true" />
+                  </Link>
+                </div>
+
+              </article>
+            );
+          })}
+        </div>
+
+        <svg width="0" height="0" className="absolute">
+          <defs>
+            <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#4285f4" />
+              <stop offset="100%" stopColor="#8a2be2" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </section>
+  );
+};
+
+export default Services;
